@@ -31,11 +31,12 @@
  * 			conversation								H
  */
 
+/* Remove the text */
 .tab-text {
 	display: none;
 }
 
+/* Display the close button on all tabs */
 .tab-close-button {
-	display: none;
+	display: block;
 }
-

@@ -1,0 +1,1 @@
+pref("browser.tabs.tabMinWidth",10);

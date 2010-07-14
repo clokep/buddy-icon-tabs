@@ -39,13 +39,33 @@ function dump(aMessage) {
 									 .getService(Components.interfaces.nsIConsoleService);
 	consoleService.logStringMessage("Buddy Icon Tabs: " + aMessage);
 }
+var buddyIconTabs = {
+	// See https://developer.mozilla.org/en/Core_JavaScript_1.5_Guide/Working_with_Objects#Defining_Getters_and_Setters
+	get events() { return ["new-conversation"]; },
 
-let buddyIconTabs = {
-	startup: function()	{
-		let tabbrowser = getBrowser();
-		// Set min width? tabbrowser.m
-		
+	observer: {
+		// Implements Components.interfaces.nsIObserver
+		observe: function(aObject, aTopic, aData) {
+			dump("Observed");
+			if (aTopic == "new-conversation") {
+				// See http://lxr.instantbird.org/instantbird/source/purple/purplexpcom/public/purpleIConversation.idl
+				let conversation = aObject._conv;
+				let buddy = conversation.buddy;
+				let buddyIconFilename = buddy.buddyIconFilename;
+				dump(buddy + "\n" + buddyIconFilename);
+				//conversation.account.protocol.id
+				//conversation.account.name
+				//conversation.name
+			}
+		},
+		load: function() {
+			addObservers(buddyIconTabs.observer, buddyIconTabs.events);
+			window.addEventListener("unload", buddyIconTabs.observer.unload, false);
+		},
+		unload: function() {
+			removeObservers(buddyIconTabs.observer, buddyIconTabs.events);
+		}
 	}
-}
+};
 
-window.addEventListener("load", function(e) { buddyIconTabs.startup(); }, false);
+this.addEventListener("load", buddyIconTabs.observer.load, false);
