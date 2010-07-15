@@ -41,31 +41,44 @@ function dump(aMessage) {
 }
 var buddyIconTabs = {
 	// See https://developer.mozilla.org/en/Core_JavaScript_1.5_Guide/Working_with_Objects#Defining_Getters_and_Setters
-	get events() { return ["new-conversation"]; },
+	get events() ["new-conversation"],
+	observerService: null,
 
 	observer: {
 		// Implements Components.interfaces.nsIObserver
 		observe: function(aObject, aTopic, aData) {
 			dump("Observed");
+			return;
 			if (aTopic == "new-conversation") {
 				// See http://lxr.instantbird.org/instantbird/source/purple/purplexpcom/public/purpleIConversation.idl
-				let conversation = aObject._conv;
-				let buddy = conversation.buddy;
+				/*
+				8:24:50 PM - flo: aObject is an instance of purpleIConversation
+				8:25:36 PM - flo: you should check that it's not a chat, and if it's not you can use aObject.buddy
+				8:25:47 PM - flo: well, check that it's not null
+				*/
+				let buddy = aConv.buddy;
+				dump(buddy);
 				let buddyIconFilename = buddy.buddyIconFilename;
 				dump(buddy + "\n" + buddyIconFilename);
 				//conversation.account.protocol.id
 				//conversation.account.name
 				//conversation.name
 			}
-		},
-		load: function() {
-			addObservers(buddyIconTabs.observer, buddyIconTabs.events);
-			window.addEventListener("unload", buddyIconTabs.observer.unload, false);
-		},
-		unload: function() {
-			removeObservers(buddyIconTabs.observer, buddyIconTabs.events);
 		}
+	},
+	load: function() {
+		buddyIconTabs.observerService =  Cc["@mozilla.org/observer-service;1"]
+										   .getService(Ci.nsIObserverService);
+		buddyIconTabs.observerService.addObserver(buddyIconTabs.observer,
+												  buddyIconTabs.events,
+												  false);
+		window.addEventListener("unload", buddyIconTabs.unload, false);
+	},
+	unload: function() {
+		buddyIconTabs.observerService.removeObserver(buddyIconTabs.observer,
+													 buddyIconTabs.events);
 	}
 };
 
-this.addEventListener("load", buddyIconTabs.observer.load, false);
+this.addEventListener("load", buddyIconTabs.load, false);
+//this.addEventListener("DOMContentLoaded", buddyIconTabs.load, false);

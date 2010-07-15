@@ -35,8 +35,6 @@
  -
  - ***** END LICENSE BLOCK ***** -->
 
-<?xml-stylesheet href="chrome://vertical-tabs/skin/tabbrowser.css" type="text/css"?>
-
 <overlay id="buddy-icon-tabs"
 		 xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	<script type="application/javascript" src="chrome://buddy-icon-tabs/content/instantbird.js" />
